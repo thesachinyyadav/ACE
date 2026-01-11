@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ExamData, ExamState, ResultSummary } from '@/types/exam';
+import { savePracticeSession } from '@/lib/storage';
 
 interface ResultsViewProps {
   examData: ExamData;
@@ -15,6 +16,7 @@ export default function ResultsView({ examData, examState, onRestart, onReturnTo
   const [copied, setCopied] = useState(false);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const calculateResults = (): ResultSummary => {
     let correctCount = 0;
@@ -47,6 +49,31 @@ export default function ResultsView({ examData, examState, onRestart, onReturnTo
   const results = calculateResults();
   const maxPossibleScore = examData.questions.length * examData.marking.correct;
   const percentage = Math.round((results.totalScore / maxPossibleScore) * 100);
+
+  // Save session to history on mount
+  useEffect(() => {
+    if (!saved) {
+      const wrongIndices = examState.responses
+        .map((response, index) => {
+          const isWrong = response.selectedIndex !== null && 
+                          response.selectedIndex !== undefined && 
+                          response.selectedIndex !== examData.questions[index].correctIndex;
+          return isWrong ? index : -1;
+        })
+        .filter(idx => idx !== -1);
+
+      savePracticeSession({
+        examName: examData.exam,
+        score: results.correctCount,
+        total: examData.questions.length,
+        percentage: Math.round((results.correctCount / examData.questions.length) * 100),
+        mode: examState.mode,
+        duration: Math.floor((Date.now() - examState.startTime) / 1000),
+        wrongQuestions: wrongIndices,
+      });
+      setSaved(true);
+    }
+  }, [saved, examData, examState, results]);
 
   const handleCopyWrong = () => {
     const wrongIndices = examState.responses
@@ -143,7 +170,7 @@ export default function ResultsView({ examData, examState, onRestart, onReturnTo
       <nav className="fixed top-0 left-0 right-0 border-b border-white/5 bg-[#09090b] backdrop-blur-xl z-50 safe-top">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-             <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain" />
+             <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain rounded-lg" />
             <span className="font-bold text-lg tracking-tight">ACE MCQ</span>
           </div>
           <div className="flex items-center gap-4">

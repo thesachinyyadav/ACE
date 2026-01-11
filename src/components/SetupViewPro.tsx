@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ExamData } from '@/types/exam';
+import { getPracticeHistory, PracticeSession, getSavedExams, saveExam, SavedExam } from '@/lib/storage';
 
 interface SetupViewProProps {
   onStartExam: (data: ExamData, mode: 'exam' | 'practice') => void;
@@ -37,6 +38,14 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
   const [showGenerator, setShowGenerator] = useState(false);
   const [genTopic, setGenTopic] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [history, setHistory] = useState<PracticeSession[]>([]);
+  const [savedExams, setSavedExams] = useState<SavedExam[]>([]);
+  const [activeTab, setActiveTab] = useState<'input' | 'history' | 'saved'>('input');
+
+  useEffect(() => {
+    setHistory(getPracticeHistory());
+    setSavedExams(getSavedExams());
+  }, []);
 
   const handleLoadSample = () => {
     setJsonInput(JSON.stringify(SAMPLE_DATA, null, 2));
@@ -120,7 +129,7 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
       <nav className="border-b border-white/5 bg-[#09090b] backdrop-blur-xl fixed top-0 left-0 right-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain rounded-lg" />
             <span className="font-bold text-lg tracking-tight">ACE MCQ</span>
           </div>
           <div className="flex items-center gap-4">
@@ -203,8 +212,104 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
             </div>
           </div>
 
-          {/* Right Column: JSON Input */}
+          {/* Right Column: Tabs */}
           <div className="lg:col-span-7 space-y-6 lg:pl-12">
+            {/* Tab Navigation */}
+            <div className="flex gap-1 p-1 bg-zinc-900/50 rounded-xl border border-white/5">
+              <button
+                onClick={() => setActiveTab('input')}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${activeTab === 'input' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              >
+                New Exam
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${activeTab === 'history' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              >
+                History
+                {history.length > 0 && <span className="text-[10px] bg-zinc-700 px-1.5 py-0.5 rounded-full">{history.length}</span>}
+              </button>
+              <button
+                onClick={() => setActiveTab('saved')}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${activeTab === 'saved' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              >
+                Saved
+                {savedExams.length > 0 && <span className="text-[10px] bg-zinc-700 px-1.5 py-0.5 rounded-full">{savedExams.length}</span>}
+              </button>
+            </div>
+
+            {/* History Tab */}
+            {activeTab === 'history' && (
+              <div className="space-y-3 animate-in fade-in slide-in-from-right-2 duration-200">
+                {history.length === 0 ? (
+                  <div className="text-center py-12 text-zinc-600">
+                    <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p className="font-medium">No practice history yet</p>
+                    <p className="text-sm text-zinc-700">Complete an exam to see your history here</p>
+                  </div>
+                ) : (
+                  history.slice(0, 10).map((session) => (
+                    <div key={session.id} className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-white text-sm">{session.examName}</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">
+                            {new Date(session.date).toLocaleDateString()} • {session.mode}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${session.percentage >= 70 ? 'text-emerald-400' : session.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {session.percentage}%
+                          </div>
+                          <div className="text-[10px] text-zinc-600">{session.score}/{session.total}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Saved Exams Tab */}
+            {activeTab === 'saved' && (
+              <div className="space-y-3 animate-in fade-in slide-in-from-right-2 duration-200">
+                {savedExams.length === 0 ? (
+                  <div className="text-center py-12 text-zinc-600">
+                    <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                    <p className="font-medium">No saved exams</p>
+                    <p className="text-sm text-zinc-700">Apply an exam config and it will be saved here</p>
+                  </div>
+                ) : (
+                  savedExams.map((exam) => (
+                    <button
+                      key={exam.id}
+                      onClick={() => {
+                        setJsonInput(exam.data);
+                        try {
+                          setExamData(JSON.parse(exam.data));
+                          setActiveTab('input');
+                        } catch {}
+                      }}
+                      className="w-full p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-blue-500/30 hover:bg-zinc-800/50 transition-all text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-white text-sm">{exam.name}</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">
+                            Saved {new Date(exam.savedAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Input Tab */}
+            {activeTab === 'input' && (
+              <div className="space-y-6 animate-in fade-in duration-150">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <h2 className="text-xl font-semibold text-white">Exam Configuration</h2>
@@ -322,7 +427,16 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
 
             <div className="pt-2">
               <button
-                onClick={examData ? handleStart : handleApplyJson}
+                onClick={() => {
+                  if (examData) {
+                    // Save exam before starting
+                    saveExam(examData.exam, examData);
+                    setSavedExams(getSavedExams());
+                    handleStart();
+                  } else {
+                    handleApplyJson();
+                  }
+                }}
                 disabled={!jsonInput.trim()}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 relative overflow-hidden group ${
                   examData
@@ -343,6 +457,8 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
                 )}
               </button>
             </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
