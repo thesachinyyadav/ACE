@@ -19,8 +19,74 @@ export interface SavedExam {
   savedAt: string;
 }
 
+export interface UserStats {
+  totalTestsAttempted: number;
+  totalQuestionsAnswered: number;
+  totalCorrect: number;
+  totalTimeSpent: number; // in seconds
+  streak: number; // consecutive days
+  lastActiveDate: string;
+}
+
 const HISTORY_KEY = 'ace_practice_history';
 const SAVED_EXAMS_KEY = 'ace_saved_exams';
+const STATS_KEY = 'ace_user_stats';
+
+// User Stats
+export function getUserStats(): UserStats {
+  if (typeof window === 'undefined') return getDefaultStats();
+  try {
+    const data = localStorage.getItem(STATS_KEY);
+    return data ? JSON.parse(data) : getDefaultStats();
+  } catch {
+    return getDefaultStats();
+  }
+}
+
+function getDefaultStats(): UserStats {
+  return {
+    totalTestsAttempted: 0,
+    totalQuestionsAnswered: 0,
+    totalCorrect: 0,
+    totalTimeSpent: 0,
+    streak: 0,
+    lastActiveDate: '',
+  };
+}
+
+export function updateUserStats(session: { total: number; score: number; duration: number }): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const stats = getUserStats();
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Update streak
+    if (stats.lastActiveDate) {
+      const lastDate = new Date(stats.lastActiveDate);
+      const todayDate = new Date(today);
+      const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1) {
+        stats.streak += 1;
+      } else if (diffDays > 1) {
+        stats.streak = 1;
+      }
+      // If same day, streak stays the same
+    } else {
+      stats.streak = 1;
+    }
+    
+    stats.totalTestsAttempted += 1;
+    stats.totalQuestionsAnswered += session.total;
+    stats.totalCorrect += session.score;
+    stats.totalTimeSpent += session.duration;
+    stats.lastActiveDate = today;
+    
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  } catch (e) {
+    console.error('Failed to update user stats:', e);
+  }
+}
 
 // Practice History
 export function getPracticeHistory(): PracticeSession[] {
@@ -46,6 +112,13 @@ export function savePracticeSession(session: Omit<PracticeSession, 'id' | 'date'
     // Keep only last 50 sessions
     const trimmed = history.slice(0, 50);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+    
+    // Also update user stats
+    updateUserStats({
+      total: session.total,
+      score: session.score,
+      duration: session.duration,
+    });
   } catch (e) {
     console.error('Failed to save practice session:', e);
   }

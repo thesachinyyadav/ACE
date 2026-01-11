@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ExamData } from '@/types/exam';
-import { getPracticeHistory, PracticeSession, getSavedExams, saveExam, SavedExam } from '@/lib/storage';
+import { getPracticeHistory, PracticeSession, getSavedExams, saveExam, SavedExam, getUserStats, UserStats } from '@/lib/storage';
 
 interface SetupViewProProps {
   onStartExam: (data: ExamData, mode: 'exam' | 'practice') => void;
@@ -41,10 +41,12 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
   const [history, setHistory] = useState<PracticeSession[]>([]);
   const [savedExams, setSavedExams] = useState<SavedExam[]>([]);
   const [activeTab, setActiveTab] = useState<'input' | 'history' | 'saved'>('input');
+  const [stats, setStats] = useState<UserStats | null>(null);
 
   useEffect(() => {
     setHistory(getPracticeHistory());
     setSavedExams(getSavedExams());
+    setStats(getUserStats());
   }, []);
 
   const handleLoadSample = () => {
@@ -127,13 +129,30 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
     <div className="min-h-screen min-h-dvh bg-[#09090b] text-white font-sans selection:bg-blue-500/30">
       {/* Navbar - Fixed for iOS */}
       <nav className="border-b border-white/5 bg-[#09090b] backdrop-blur-xl fixed top-0 left-0 right-0 z-50 safe-top">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain rounded-lg" />
             <span className="font-bold text-lg tracking-tight">ACE MCQ</span>
           </div>
-          <div className="flex items-center gap-4">
-             <div className="text-xs font-mono text-zinc-500 px-2 py-1">v2.0</div>
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Tests Attempted Badge */}
+            {stats && stats.totalTestsAttempted > 0 && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-lg">
+                <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xs font-bold text-white tabular-nums">{stats.totalTestsAttempted}</span>
+                <span className="text-[10px] text-zinc-500 hidden sm:inline">tests</span>
+              </div>
+            )}
+            {/* Streak Badge */}
+            {stats && stats.streak > 1 && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <span className="text-sm">🔥</span>
+                <span className="text-xs font-bold text-amber-400 tabular-nums">{stats.streak}</span>
+              </div>
+            )}
+            <div className="text-xs font-mono text-zinc-600 px-2 py-1 hidden sm:block">v2.0</div>
           </div>
         </div>
       </nav>
