@@ -28,6 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -37,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="antialiased bg-[#09090b] text-zinc-100 selection:bg-blue-500/30">
+      <body className="antialiased bg-[#09090b] text-zinc-100 selection:bg-blue-500/30 min-h-screen min-h-dvh">
         {children}
       </body>
     </html>

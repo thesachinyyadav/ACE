@@ -138,10 +138,10 @@ export default function ResultsView({ examData, examState, onRestart, onReturnTo
   }, [onRestart, onReturnToSetup]);
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white font-sans p-6 md:p-12">
-      {/* Navbar for Results Page */}
-      <nav className="fixed top-0 left-0 right-0 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-xl z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen min-h-dvh bg-[#09090b] text-white font-sans">
+      {/* Navbar for Results Page - Fixed for iOS */}
+      <nav className="fixed top-0 left-0 right-0 border-b border-white/5 bg-[#09090b] backdrop-blur-xl z-50 safe-top">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
              <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain" />
             <span className="font-bold text-lg tracking-tight">ACE MCQ</span>
@@ -156,7 +156,10 @@ export default function ResultsView({ examData, examState, onRestart, onReturnTo
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto space-y-8 mt-16">
+      {/* Spacer for fixed navbar */}
+      <div className="h-14 safe-top"></div>
+
+      <div className="max-w-4xl mx-auto space-y-8 p-6 md:p-12">
         
         {/* Results Header Card */}
         <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">

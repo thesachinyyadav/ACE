@@ -115,10 +115,10 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white font-sans selection:bg-blue-500/30">
-      {/* Navbar */}
-      <nav className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen min-h-dvh bg-[#09090b] text-white font-sans selection:bg-blue-500/30">
+      {/* Navbar - Fixed for iOS */}
+      <nav className="border-b border-white/5 bg-[#09090b] backdrop-blur-xl fixed top-0 left-0 right-0 z-50 safe-top">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="ACE Logo" className="w-8 h-8 object-contain" />
             <span className="font-bold text-lg tracking-tight">ACE MCQ</span>
@@ -128,6 +128,9 @@ export default function SetupViewPro({ onStartExam }: SetupViewProProps) {
           </div>
         </div>
       </nav>
+      
+      {/* Spacer for fixed navbar */}
+      <div className="h-14 safe-top"></div>
 
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-12 gap-12">
