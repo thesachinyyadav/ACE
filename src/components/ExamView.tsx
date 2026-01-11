@@ -142,56 +142,76 @@ export default function ExamView({ examData, examState, setExamState, onReturnTo
 
   return (
     <div className="min-h-screen min-h-dvh bg-[#09090b] text-white font-sans">
-      {/* Header - Fixed for iOS */}
-      <nav className="border-b border-white/5 bg-[#09090b] backdrop-blur-xl fixed top-0 left-0 right-0 z-50 safe-top">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-               <span className="font-bold text-sm">
-                 {examState.currentQuestionIndex + 1}
-               </span>
-             </div>
-             <div>
-               <div className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Question</div>
-               <div className="text-sm font-semibold text-zinc-200">
-                 {examState.currentQuestionIndex + 1} <span className="text-zinc-600">/</span> {examData.questions.length}
-               </div>
-             </div>
+      {/* Header - Fixed for iOS - Ultra Clean */}
+      <nav className="border-b border-white/5 bg-[#09090b] fixed top-0 left-0 right-0 z-50 safe-top">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
+          {/* Left: Question Counter - Minimal */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-white tabular-nums">
+              {examState.currentQuestionIndex + 1}
+            </span>
+            <span className="text-zinc-600">/</span>
+            <span className="text-sm text-zinc-500 tabular-nums">
+              {examData.questions.length}
+            </span>
           </div>
 
-          <div className="flex items-center gap-6">
+          {/* Center: Progress Indicator - Visual */}
+          <div className="hidden sm:flex items-center gap-1 flex-1 max-w-xs mx-4">
+            {examData.questions.map((_, idx) => (
+              <div 
+                key={idx}
+                className={`h-1 flex-1 rounded-full transition-all duration-200 ${
+                  idx === examState.currentQuestionIndex 
+                    ? 'bg-blue-500' 
+                    : idx < examState.currentQuestionIndex 
+                      ? examState.responses[idx]?.selectedIndex !== null 
+                        ? 'bg-emerald-500/60' 
+                        : 'bg-zinc-700'
+                      : 'bg-zinc-800'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Right: Timer + Submit */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {examState.mode === 'exam' && (
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${
-                examState.timeRemaining < 60 ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-zinc-900 border-white/5 text-zinc-300'
+              <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-mono font-semibold tabular-nums ${
+                examState.timeRemaining < 60 
+                  ? 'bg-red-500/15 text-red-400 animate-pulse' 
+                  : examState.timeRemaining < 300 
+                    ? 'bg-amber-500/15 text-amber-400'
+                    : 'text-zinc-400'
               }`}>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="font-mono font-medium">{formatTime(examState.timeRemaining)}</span>
+                <span>{formatTime(examState.timeRemaining)}</span>
               </div>
             )}
             
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 text-sm font-medium bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-xs font-semibold bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg transition-all active:scale-95"
             >
-              Submit Exam
+              Submit
             </button>
           </div>
         </div>
-        {/* Progress Bar */}
-        <div className="h-0.5 w-full bg-zinc-900">
+        {/* Progress Bar - Thinner */}
+        <div className="h-[2px] w-full bg-zinc-900/50">
           <div 
-            className="h-full bg-blue-600 transition-all duration-300 ease-out" 
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 ease-out" 
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </nav>
 
       {/* Spacer for fixed navbar */}
-      <div className="h-14 safe-top"></div>
+      <div className="h-12 safe-top"></div>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         <QuestionPanel
           question={currentQuestion}
           questionIndex={examState.currentQuestionIndex}

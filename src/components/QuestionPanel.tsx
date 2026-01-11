@@ -57,34 +57,33 @@ export default function QuestionPanel({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 animate-in fade-in duration-300">
       
       {/* Question Card */}
-      <div className="space-y-6">
-         <h2 className="text-2xl md:text-3xl font-semibold text-white leading-tight tracking-tight">
+      <div className="space-y-5">
+         <h2 className="text-xl sm:text-2xl font-semibold text-white leading-snug tracking-tight">
           {question.question}
         </h2>
 
-
-        {/* Options Grid */}
-        <div className="grid gap-3 pt-2">
+        {/* Options Grid - Compact & Touch Friendly */}
+        <div className="grid gap-2">
           {question.options.map((option, index) => {
             const isSelected = selectedOption === index;
             const showCorrect = showFeedback && index === question.correctIndex;
             const showWrong = showFeedback && isSelected && !isCorrect;
 
-            let baseClasses = "group relative w-full text-left p-5 rounded-xl border transition-all duration-200 flex items-center gap-4 outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#09090b] focus:ring-blue-500/50";
-            let stateClasses = "bg-zinc-900/50 border-white/5 hover:bg-zinc-900 hover:border-zinc-700 text-zinc-300";
-            let indicatorClasses = "border-zinc-700 text-zinc-500 group-hover:border-zinc-600 group-hover:text-zinc-400";
+            let baseClasses = "group relative w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-150 flex items-center gap-3 outline-none active:scale-[0.98]";
+            let stateClasses = "bg-zinc-900/60 border-zinc-800 hover:bg-zinc-800/80 hover:border-zinc-700 text-zinc-200";
+            let indicatorClasses = "border-zinc-600 text-zinc-500 bg-zinc-800";
 
             if (showCorrect) {
-              stateClasses = "bg-emerald-500/10 border-emerald-500/50 text-emerald-100";
+              stateClasses = "bg-emerald-500/15 border-emerald-500/40 text-emerald-50";
               indicatorClasses = "bg-emerald-500 border-emerald-500 text-white";
             } else if (showWrong) {
-              stateClasses = "bg-red-500/10 border-red-500/50 text-red-100";
+              stateClasses = "bg-red-500/15 border-red-500/40 text-red-50";
               indicatorClasses = "bg-red-500 border-red-500 text-white";
             } else if (isSelected) {
-              stateClasses = "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20";
+              stateClasses = "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/25";
               indicatorClasses = "bg-white text-blue-600 border-white";
             }
 
@@ -95,17 +94,17 @@ export default function QuestionPanel({
                 disabled={showFeedback}
                 className={`${baseClasses} ${stateClasses}`}
               >
-                <div className={`w-8 h-8 rounded-lg border flex items-center justify-center text-sm font-bold transition-colors ${indicatorClasses}`}>
+                <div className={`w-7 h-7 rounded-lg border flex-shrink-0 flex items-center justify-center text-xs font-bold transition-colors ${indicatorClasses}`}>
                   {String.fromCharCode(65 + index)}
                 </div>
-                <div className="text-lg font-medium">{option}</div>
+                <span className="text-base font-medium leading-snug">{option}</span>
                 
                 {mode === 'practice' && showFeedback && (index === question.correctIndex || (isSelected && !isCorrect)) && (
-                   <div className="ml-auto">
+                   <div className="ml-auto flex-shrink-0">
                      {index === question.correctIndex ? (
-                        <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                      ) : (
-                        <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
                      )}
                    </div>
                 )}
@@ -115,17 +114,17 @@ export default function QuestionPanel({
         </div>
       </div>
 
-      {/* Explanation / Hint Area (Practice Mode) */}
+      {/* Explanation / Hint Area (Practice Mode) - Compact */}
       {mode === 'practice' && (
-        <div className="min-h-[100px]">
+        <div className="min-h-[80px]">
            {showFeedback ? (
-             <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5 animate-in fade-in slide-in-from-top-2">
-                <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-zinc-400 uppercase tracking-wider">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+             <div className="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   Explanation
                 </div>
-                <p className="text-zinc-300 leading-relaxed text-lg">
-                  {question.explanation || "No explanation provided for this question."}
+                <p className="text-zinc-300 leading-relaxed text-sm">
+                  {question.explanation || "No explanation provided."}
                 </p>
              </div>
            ) : (
@@ -134,27 +133,27 @@ export default function QuestionPanel({
                  <button
                     onClick={fetchAIHint}
                     disabled={loadingHint}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all text-sm font-medium"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-purple-400 hover:border-purple-500/30 transition-all text-xs font-medium"
                  >
                     {loadingHint ? (
                       <>
-                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg> 
-                        Generating Hint...
+                        <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg> 
+                        Loading...
                       </>
                     ) : (
                       <>
-                        <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                        Get AI Hint
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        AI Hint
                       </>
                     )}
                  </button>
                ) : (
-                  <div className="w-full bg-purple-500/5 rounded-2xl p-6 border border-purple-500/20 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-purple-400 uppercase tracking-wider">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                      AI Hint
+                  <div className="w-full bg-purple-500/5 rounded-xl p-4 border border-purple-500/20 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-purple-400 uppercase tracking-wider">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      Hint
                     </div>
-                    <p className="text-zinc-300 leading-relaxed italic">
+                    <p className="text-zinc-400 leading-relaxed text-sm italic">
                       {hint}
                     </p>
                   </div>
@@ -164,23 +163,29 @@ export default function QuestionPanel({
         </div>
       )}
 
-      {/* Navigation Footer */}
-      <div className="flex items-center justify-between pt-8 border-t border-white/5">
+      {/* Navigation Footer - Compact */}
+      <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
         <button
           onClick={onPrevious}
           disabled={!canGoPrevious}
-          className="px-6 py-3 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 disabled:opacity-0 transition-all flex items-center gap-2"
+          className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-zinc-800 disabled:opacity-0 disabled:pointer-events-none transition-all"
+          aria-label="Previous"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Previous
         </button>
+
+        {/* Keyboard hints - Desktop only */}
+        <div className="hidden sm:flex items-center gap-3 text-[10px] text-zinc-600">
+          <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-500">1-4</kbd> Select</span>
+          <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-500">←→</kbd> Navigate</span>
+        </div>
         
         <button
           onClick={onNext}
           disabled={!canGoNext}
-          className={`px-6 py-3 rounded-xl font-medium bg-white text-black hover:bg-zinc-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5 ${!canGoNext ? 'opacity-0 pointer-events-none' : ''}`}
+          className={`p-2.5 rounded-xl bg-white text-zinc-900 hover:bg-zinc-200 transition-all active:scale-95 ${!canGoNext ? 'opacity-0 pointer-events-none' : ''}`}
+          aria-label="Next"
         >
-          Next Question
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
